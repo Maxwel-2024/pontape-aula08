@@ -1,7 +1,8 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
-# 1. Montar o DataFrame com os dados da tabela
+# 1. Dataset da parte (c)
 dados = {
     "Temperatura": [30, 25, 20, 15, 32, 28, 22, 18],
     "Umidade": [60, 70, 80, 90, 55, 75, 88, 92],
@@ -9,25 +10,22 @@ dados = {
 }
 df = pd.DataFrame(dados)
 
-# 2. Separar as variáveis de entrada (X) e a meta (y)
 X = df[["Temperatura", "Umidade"]]
 y = df["Choveu"]
 
-# 3. Treinar o RandomForestClassifier
+# 2. Dividir em treino (80%) e teste (20%)
+X_treino, X_teste, y_treino, y_teste = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 3. Treinar o modelo apenas com o conjunto de treino
 modelo = RandomForestClassifier(n_estimators=100, random_state=42)
-modelo.fit(X, y)
+modelo.fit(X_treino, y_treino)
 
-# 4. Novos dados para previsão
-novos_dados = [[26, 65], [17, 89]]
+# 4. Avaliar a acurácia no conjunto de teste
+acuracia = modelo.score(X_teste, y_teste)
 
-# 5. Realizar as previsões
-previsoes = modelo.predict(novos_dados)
-
-# 6. Exibir o resultado formatado
-for dados_entrada, prev in zip(novos_dados, previsoes):
-    texto = (
-        "Há previsão de chuva" if prev == 1 else "Não há previsão de chuva"
-    )
-    print(
-        f"Temperatura = {dados_entrada[0]} , Umidade = {dados_entrada[1]}: {texto}"
-    )
+# 5. Exibir os resultados
+print(f"Tamanho do treino: {len(X_treino)}")
+print(f"Tamanho do teste: {len(X_teste)}")
+print(f"Acurácia no teste: {acuracia:.2f}")
