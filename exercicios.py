@@ -1,18 +1,17 @@
 from sklearn.linear_model import LinearRegression
 
-# 1. Dados de entrada (X) e saídas esperadas (y)
-# Lembre-se: X precisa ser uma matriz 2D (lista de listas ou array 2D)
+# 1. Dados de treino (X em 2D e y em 1D)
 X = [[1], [2], [3], [4], [5]]
 y = [3, 6, 9, 12, 15]
 
-# 2. Instanciar o modelo de Regressão Linear
+# 2. Instanciar e treinar o modelo
 modelo = LinearRegression()
-
-# 3. Treinar o modelo com os dados de exemplo
 modelo.fit(X, y)
 
-# 4. Fazer a previsão para o número 10
-previsao = modelo.predict([[10]])
+# 3. Extrair os parâmetros aprendidos (tratando o -0.0 com abs)
+inclinacao = modelo.coef_
+deslocamento = abs(modelo.intercept_)
 
-# 5. Exibir o resultado formatado
-print(f"Previsão para 10: {previsao[0]:.2f}")
+# 4. Exibir apenas a saída da Parte (b)
+print(f"Inclinação (coef_): {inclinacao}")
+print(f"Deslocamento (intercept_): {deslocamento:.1f}")
