@@ -1,17 +1,33 @@
-from sklearn.linear_model import LinearRegression
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 
-# 1. Dados de treino (X em 2D e y em 1D)
-X = [[1], [2], [3], [4], [5]]
-y = [3, 6, 9, 12, 15]
+# 1. Montar o DataFrame com os dados da tabela
+dados = {
+    "Temperatura": [30, 25, 20, 15, 32, 28, 22, 18],
+    "Umidade": [60, 70, 80, 90, 55, 75, 88, 92],
+    "Choveu": [1, 1, 0, 0, 1, 1, 0, 0],
+}
+df = pd.DataFrame(dados)
 
-# 2. Instanciar e treinar o modelo
-modelo = LinearRegression()
+# 2. Separar as variáveis de entrada (X) e a meta (y)
+X = df[["Temperatura", "Umidade"]]
+y = df["Choveu"]
+
+# 3. Treinar o RandomForestClassifier
+modelo = RandomForestClassifier(n_estimators=100, random_state=42)
 modelo.fit(X, y)
 
-# 3. Extrair os parâmetros aprendidos (tratando o -0.0 com abs)
-inclinacao = modelo.coef_
-deslocamento = abs(modelo.intercept_)
+# 4. Novos dados para previsão
+novos_dados = [[26, 65], [17, 89]]
 
-# 4. Exibir apenas a saída da Parte (b)
-print(f"Inclinação (coef_): {inclinacao}")
-print(f"Deslocamento (intercept_): {deslocamento:.1f}")
+# 5. Realizar as previsões
+previsoes = modelo.predict(novos_dados)
+
+# 6. Exibir o resultado formatado
+for dados_entrada, prev in zip(novos_dados, previsoes):
+    texto = (
+        "Há previsão de chuva" if prev == 1 else "Não há previsão de chuva"
+    )
+    print(
+        f"Temperatura = {dados_entrada[0]} , Umidade = {dados_entrada[1]}: {texto}"
+    )
