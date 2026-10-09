@@ -1,44 +1,29 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import GridSearchCV, train_test_split
 
-# 1. Carregar o arquivo vendas.csv
+# 1. Carregar os dados e aplicar get_dummies
 df = pd.read_csv("vendas.csv")
-
-# 2. Aplicar get_dummies na coluna categórica 'Promocao'
 df_encoded = pd.get_dummies(df, columns=["Promocao"], drop_first=True)
 
-# 3. Separar X e y
+# 2. Separar X e y
 X = df_encoded.drop(columns=["Vendas"])
 y = df_encoded["Vendas"]
 
-# 4. Dividir treino/teste (test_size=0.2, random_state=42)
+# 3. Dividir em treino e teste
 X_treino, X_teste, y_treino, y_teste = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# 5. Instanciar e treinar os 3 modelos de regressão
-modelos = {
-    "Linear Regression": LinearRegression(),
-    "Decision Tree": DecisionTreeRegressor(random_state=42),
-    "Random Forest": RandomForestRegressor(random_state=42),
-}
+# 4. Definir a grade de parâmetros para testar
+param_grid = {"n_estimators": [10, 50, 100, 200], "max_depth": [None, 2, 4, 6]}
 
-r2_resultados = {}
+# 5. Instanciar e rodar o GridSearchCV no RandomForestRegressor
+rf = RandomForestRegressor(random_state=42)
+grid_search = GridSearchCV(
+    estimator=rf, param_grid=param_grid, cv=3, scoring="r2"
+)
+grid_search.fit(X_treino, y_treino)
 
-for nome, modelo in modelos.items():
-    modelo.fit(X_treino, y_treino)
-    previsoes = modelo.predict(X_teste)
-    r2_resultados[nome] = r2_score(y_teste, previsoes)
-
-# 6. Identificar o modelo com o maior R²
-melhor_modelo = max(r2_resultados, key=r2_resultados.get)
-
-# Exibir os resultados formatados
-print(f"R² Linear:        {r2_resultados['Linear Regression']:.2f}")
-print(f"R² Árvore:        {r2_resultados['Decision Tree']:.2f}")
-print(f"R² Random Forest: {r2_resultados['Random Forest']:.2f}")
-print(f"Melhor modelo:    {melhor_modelo}")
+# 6. Exibir os melhores parâmetros encontrados
+print(f"Melhores parâmetros: {grid_search.best_params_}")
